@@ -2,181 +2,164 @@
 <html lang="es" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI WebApp Studio - Modo Gratuito</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI WebApp Studio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome para iconos -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="h-full text-slate-100 flex flex-col overflow-hidden">
+<body class="h-full text-slate-100 flex flex-col overflow-hidden font-sans">
 
     <!-- BARRA SUPERIOR -->
-    <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0">
-        <div class="flex items-center space-x-3">
-            <div class="bg-indigo-600 text-white p-2 rounded-lg shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+    <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-3 shrink-0">
+        <div class="flex items-center space-x-2">
+            <div class="bg-indigo-600 text-white p-1.5 rounded-lg">
+                <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
             </div>
-            <span class="font-bold tracking-wide text-lg bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">AI WebApp Studio (Free Tier)</span>
+            <span class="font-bold text-sm bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">AI Studio</span>
         </div>
-        <div class="flex items-center space-x-4">
-            <!-- Selector de Proveedor Gratuito -->
-            <select id="provider-select" onchange="changeProvider()" class="bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-lg px-2 py-1.5 focus:outline-none">
-                <option value="groq">Groq (Llama 3.3 - Gratis)</option>
-                <option value="openrouter">OpenRouter (Modelos Free)</option>
+        <div class="flex items-center space-x-2">
+            <select id="provider-select" onchange="saveConfig()" class="bg-slate-950 border border-slate-800 text-[10px] text-slate-300 rounded px-1.5 py-1">
+                <option value="groq">Groq (Llama 3.1)</option>
+                <option value="openrouter">OpenRouter</option>
             </select>
-            <!-- Configurar API Key -->
-            <div class="flex items-center space-x-2 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg">
-                <i class="fa-solid fa-key text-xs text-amber-400"></i>
-                <input type="password" id="api-key-input" placeholder="Pegá tu API Key Gratuita" class="bg-transparent text-xs text-slate-200 focus:outline-none w-40 placeholder-slate-600">
-                <button onclick="saveApiKey()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded transition">Guardar</button>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sm font-semibold text-slate-300">YO</div>
+            <input type="password" id="api-key-input" placeholder="API Key" class="bg-slate-950 border border-slate-800 text-[10px] text-slate-200 px-2 py-1 rounded w-20">
+            <button onclick="saveConfig()" class="text-[10px] bg-indigo-600 text-white px-2 py-1 rounded">Guardar</button>
         </div>
     </header>
 
     <!-- CONTENEDOR PRINCIPAL -->
-    <div class="flex-1 flex overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden">
         
-        <!-- COLUMNA IZQUIERDA: CHAT CON LA IA -->
-        <section class="w-1/3 bg-slate-900/60 border-r border-slate-800 flex flex-col">
-            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm">
-                <div class="flex items-start space-x-3">
-                    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">IA</div>
-                    <div class="bg-slate-800/80 border border-slate-700/60 p-3.5 rounded-2xl rounded-tl-sm space-y-2 text-slate-300">
-                        <p>¡Hola! Conseguí una API Key gratuita en <a href="https://console.groq.com" target="_blank" class="text-indigo-400 underline">Groq Console</a> o <a href="https://openrouter.ai" target="_blank" class="text-indigo-400 underline">OpenRouter</a>, pegala arriba y empecemos a crear.</p>
+        <!-- PANELES (Pestañas) -->
+        <div class="flex bg-slate-900 border-b border-slate-800 text-xs">
+            <button onclick="switchMainTab('chat')" id="tab-btn-chat" class="flex-1 py-2 text-center font-medium bg-indigo-600/20 text-indigo-400 border-b-2 border-indigo-500">Chat IA</button>
+            <button onclick="switchMainTab('preview')" id="tab-btn-preview" class="flex-1 py-2 text-center font-medium text-slate-400">Previsualización</button>
+            <button onclick="switchMainTab('code')" id="tab-btn-code" class="flex-1 py-2 text-center font-medium text-slate-400">Código</button>
+        </div>
+
+        <!-- PANEL CHAT -->
+        <div id="panel-chat" class="flex-1 flex flex-col bg-slate-950 overflow-hidden">
+            <div id="chat-messages" class="flex-1 p-3 overflow-y-auto space-y-3 text-xs">
+                <div class="flex items-start space-x-2">
+                    <div class="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white shrink-0 text-[10px] font-bold">IA</div>
+                    <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-300">
+                        ¡Hola! Poné tu API Key arriba, guardala, escribime qué app querés hacer y tocá <b>Generar</b>.
                     </div>
                 </div>
             </div>
-
-            <div class="p-4 bg-slate-900 border-t border-slate-800">
-                <form id="prompt-form" class="flex flex-col gap-2">
-                    <div class="relative">
-                        <textarea id="user-input" rows="3" placeholder="Ej: Creame una app para gestionar inventario..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"></textarea>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span id="status-indicator" class="text-xs text-slate-500">Listo para generar</span>
-                        <button type="submit" id="submit-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2 rounded-lg text-xs transition shadow-md shadow-indigo-600/30 flex items-center space-x-2 cursor-pointer">
-                            <span>Generar Código</span>
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </form>
+            <div class="p-3 bg-slate-900 border-t border-slate-800 flex gap-2">
+                <textarea id="user-input" rows="2" placeholder="Ej: Una app de notas..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:outline-none resize-none"></textarea>
+                <button type="button" id="send-btn" onclick="generateApp()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 rounded-lg text-xs font-medium flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
             </div>
-        </section>
+        </div>
 
-        <!-- COLUMNA DERECHA: PREVIEW Y CÓDIGO -->
-        <section class="w-2/3 bg-slate-950 flex flex-col">
-            <div class="h-11 bg-slate-900/40 border-b border-slate-800 flex items-center px-4 justify-between shrink-0">
-                <div class="flex space-x-2">
-                    <button onclick="switchTab('preview')" id="btn-preview" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition">Previsualización</button>
-                    <button onclick="switchTab('code')" id="btn-code" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition">Código Fuente</button>
-                </div>
-                <div class="text-xs text-slate-500">Renderizado: <span class="text-emerald-400">Automático</span></div>
-            </div>
+        <!-- PANEL PREVIEW -->
+        <div id="panel-preview" class="flex-1 bg-white hidden">
+            <iframe id="preview-frame" class="w-full h-full border-0" srcdoc="<div style='display:flex;height:100vh;align-items:center;justify-content:center;font-family:sans-serif;color:#64748b;font-size:14px;'>Tu webapp aparecerá aquí.</div>"></iframe>
+        </div>
 
-            <!-- Previsualización -->
-            <div id="tab-preview" class="flex-1 bg-white">
-                <iframe id="preview-frame" class="w-full h-full border-0" srcdoc="<div style='display:flex;height:100vh;align-items:center;justify-content:center;font-family:sans-serif;color:#64748b;'>Tu webapp aparecerá aquí una vez generada.</div>"></iframe>
-            </div>
-
-            <!-- Código Fuente -->
-            <div id="tab-code" class="flex-1 bg-slate-900 p-4 font-mono text-xs text-slate-300 overflow-y-auto hidden">
-                <pre><code id="code-content">&lt;!-- El código fuente generado aparecerá aquí --&gt;</code></pre>
-            </div>
-        </section>
+        <!-- PANEL CÓDIGO -->
+        <div id="panel-code" class="flex-1 bg-slate-900 p-3 font-mono text-[10px] text-slate-300 overflow-y-auto hidden">
+            <pre><code id="code-content">&lt;!-- Código fuente --&gt;</code></pre>
+        </div>
     </div>
 
-    <!-- LÓGICA CON API GRATUITA -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            const savedKey = localStorage.getItem('ai_free_api_key');
-            const savedProvider = localStorage.getItem('ai_provider') || 'groq';
+            const savedKey = localStorage.getItem('ai_key');
+            const savedProvider = localStorage.getItem('ai_prov') || 'groq';
             if (savedKey) document.getElementById('api-key-input').value = savedKey;
             document.getElementById('provider-select').value = savedProvider;
         });
 
-        function saveApiKey() {
+        function saveConfig() {
             const key = document.getElementById('api-key-input').value.trim();
-            const provider = document.getElementById('provider-select').value;
+            const prov = document.getElementById('provider-select').value;
             if(key) {
-                localStorage.setItem('ai_free_api_key', key);
-                localStorage.setItem('ai_provider', provider);
-                alert('¡Configuración guardada con éxito!');
+                localStorage.setItem('ai_key', key);
+                localStorage.setItem('ai_prov', prov);
+                alert('¡Guardado!');
             }
         }
 
-        function changeProvider() {
-            localStorage.setItem('ai_provider', document.getElementById('provider-select').value);
-        }
+        function switchMainTab(tab) {
+            const pChat = document.getElementById('panel-chat');
+            const pPrev = document.getElementById('panel-preview');
+            const pCode = document.getElementById('panel-code');
+            
+            const bChat = document.getElementById('tab-btn-chat');
+            const bPrev = document.getElementById('tab-btn-preview');
+            const bCode = document.getElementById('tab-btn-code');
 
-        function switchTab(tab) {
-            const previewTab = document.getElementById('tab-preview');
-            const codeTab = document.getElementById('tab-code');
-            const btnPreview = document.getElementById('btn-preview');
-            const btnCode = document.getElementById('btn-code');
+            pChat.classList.add('hidden');
+            pPrev.classList.add('hidden');
+            pCode.classList.add('hidden');
+            bChat.className = "flex-1 py-2 text-center font-medium text-slate-400 border-b-2 border-transparent";
+            bPrev.className = "flex-1 py-2 text-center font-medium text-slate-400 border-b-2 border-transparent";
+            bCode.className = "flex-1 py-2 text-center font-medium text-slate-400 border-b-2 border-transparent";
 
-            if (tab === 'preview') {
-                previewTab.classList.remove('hidden');
-                codeTab.classList.add('hidden');
-                btnPreview.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition";
-                btnCode.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition";
-            } else {
-                previewTab.classList.add('hidden');
-                codeTab.classList.remove('hidden');
-                btnCode.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 transition";
-                btnPreview.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 transition";
+            if (tab === 'chat') {
+                pChat.classList.remove('hidden');
+                bChat.className = "flex-1 py-2 text-center font-medium bg-indigo-600/20 text-indigo-400 border-b-2 border-indigo-500";
+            } else if (tab === 'preview') {
+                pPrev.classList.remove('hidden');
+                bPrev.className = "flex-1 py-2 text-center font-medium bg-indigo-600/20 text-indigo-400 border-b-2 border-indigo-500";
+            } else if (tab === 'code') {
+                pCode.classList.remove('hidden');
+                bCode.className = "flex-1 py-2 text-center font-medium bg-indigo-600/20 text-indigo-400 border-b-2 border-indigo-500";
             }
         }
 
-        document.getElementById('prompt-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const apiKey = localStorage.getItem('ai_free_api_key') || document.getElementById('api-key-input').value.trim();
+        async function generateApp() {
+            const apiKey = localStorage.getItem('ai_key') || document.getElementById('api-key-input').value.trim();
             const provider = document.getElementById('provider-select').value;
             const input = document.getElementById('user-input');
             const text = input.value.trim();
-            
+
             if(!apiKey) {
-                alert('Por favor ingresa y guarda tu API Key gratuita.');
+                alert('Por favor ingresa y guarda tu API Key.');
                 return;
             }
             if(!text) return;
 
             const chatMessages = document.getElementById('chat-messages');
-            const statusIndicator = document.getElementById('status-indicator');
-            const submitBtn = document.getElementById('submit-btn');
+            const sendBtn = document.getElementById('send-btn');
 
             chatMessages.innerHTML += `
-                <div class="flex items-start space-x-3 justify-end">
-                    <div class="bg-indigo-600 text-white p-3.5 rounded-2xl rounded-tr-sm text-slate-100 max-w-[80%]">${text}</div>
+                <div class="flex items-start space-x-2 justify-end">
+                    <div class="bg-indigo-600 text-white p-2.5 rounded-xl text-xs max-w-[85%]">${text}</div>
                 </div>
             `;
             input.value = '';
             chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            statusIndicator.textContent = "La IA está programando...";
-            submitBtn.disabled = true;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
             try {
                 let apiUrl = '';
                 let requestBody = {};
+                const systemPrompt = "Eres un desarrollador experto en HTML5 y Tailwind CSS. Crea una app web completa en un solo archivo. Devuelve ÚNICAMENTE el código HTML puro, con <!DOCTYPE html> y el script https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4. NO uses markdown (nada de ```html), ni texto extra.";
 
                 if (provider === 'groq') {
-                    apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+                    apiUrl = '[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)';
                     requestBody = {
-                        model: "llama-3.3-70b-versatile",
+                        model: "llama-3.1-8b-instant",
                         messages: [
-                            { role: "system", content: "Eres un desarrollador experto en HTML5 y Tailwind CSS. Devuelve ÚNICAMENTE el código HTML completo con etiquetas <!DOCTYPE html> y el script de Tailwind https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4. Sin explicaciones ni texto extra." },
+                            { role: "system", content: systemPrompt },
                             { role: "user", content: text }
                         ],
                         temperature: 0.7
                     };
-                } else if (provider === 'openrouter') {
-                    apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+                } else {
+                    apiUrl = '[https://openrouter.ai/api/v1/chat/completions](https://openrouter.ai/api/v1/chat/completions)';
                     requestBody = {
-                        model: "deepseek/deepseek-chat:free", // Modelo gratuito de ejemplo en OpenRouter
+                        model: "meta-llama/llama-3.1-8b-instruct:free",
                         messages: [
-                            { role: "system", content: "Eres un desarrollador experto en HTML5 y Tailwind CSS. Devuelve ÚNICAMENTE el código HTML completo con etiquetas <!DOCTYPE html> y el script de Tailwind https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4. Sin explicaciones ni texto extra." },
+                            { role: "system", content: systemPrompt },
                             { role: "user", content: text }
                         ],
                         temperature: 0.7
@@ -192,17 +175,19 @@
                     body: JSON.stringify(requestBody)
                 });
 
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
+                if (!response.ok) {
+                    throw new Error('Error en la API. Código: ' + response.status);
+                }
 
+                const data = await response.json();
                 let generatedCode = data.choices[0].message.content;
-                generatedCode = generatedCode.replace(/```html/g, '').replace(/```/g, '').trim();
+                generatedCode = generatedCode.replace(/```html/gi, '').replace(/```/g, '').trim();
 
                 chatMessages.innerHTML += `
-                    <div class="flex items-start space-x-3">
-                        <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white shrink-0 text-xs font-bold">IA</div>
-                        <div class="bg-slate-800/80 border border-slate-700/60 p-3.5 rounded-2xl rounded-tl-sm space-y-2 text-slate-300">
-                            <p>¡Listo! Webapp generada mediante la API gratuita.</p>
+                    <div class="flex items-start space-x-2">
+                        <div class="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white shrink-0 text-[10px] font-bold">IA</div>
+                        <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl text-slate-300">
+                            ¡Listo! App generada. Toca la pestaña <b>Previsualización</b> arriba para verla.
                         </div>
                     </div>
                 `;
@@ -210,15 +195,15 @@
 
                 document.getElementById('preview-frame').srcdoc = generatedCode;
                 document.getElementById('code-content').textContent = generatedCode;
-                statusIndicator.textContent = "Generado con éxito";
+                switchMainTab('preview');
 
             } catch (error) {
                 alert('Error: ' + error.message);
-                statusIndicator.textContent = "Error en la generación";
             } finally {
-                submitBtn.disabled = false;
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
             }
-        });
+        }
     </script>
 </body>
 </html>
